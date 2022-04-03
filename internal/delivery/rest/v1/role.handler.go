@@ -2,12 +2,13 @@ package v1
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/aintsashqa/roles-and-permissions/internal/cerror"
 	"github.com/aintsashqa/roles-and-permissions/internal/delivery"
 	pkg "github.com/aintsashqa/roles-and-permissions/pkg/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 type (

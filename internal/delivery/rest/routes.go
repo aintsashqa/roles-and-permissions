@@ -1,10 +1,10 @@
 package rest
 
 import (
-	v1 "github.com/aintsashqa/roles-and-permissions/internal/delivery/rest/v1"
 	"net/http"
 
 	"github.com/aintsashqa/roles-and-permissions/internal/delivery"
+	v1 "github.com/aintsashqa/roles-and-permissions/internal/delivery/rest/v1"
 	"github.com/go-chi/chi/v5"
 )
 

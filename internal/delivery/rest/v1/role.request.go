@@ -2,10 +2,10 @@ package v1
 
 import (
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 
 	"github.com/aintsashqa/roles-and-permissions/internal/cerror"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
