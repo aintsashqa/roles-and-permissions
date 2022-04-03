@@ -17,10 +17,11 @@ type (
 	}
 
 	RoleDto struct {
-		ID             uuid.UUID
-		Name           string
-		CreationDate   time.Time
-		LastUpdateDate time.Time
+		ID               uuid.UUID
+		Name             string
+		CreationDate     time.Time
+		LastUpdateDate   time.Time
+		MarkAsDeleteDate *time.Time
 	}
 
 	RolesListDto struct {

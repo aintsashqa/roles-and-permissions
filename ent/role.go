@@ -23,6 +23,8 @@ type Role struct {
 	CreationDate time.Time `json:"creation_date,omitempty"`
 	// LastUpdateDate holds the value of the "last_update_date" field.
 	LastUpdateDate time.Time `json:"last_update_date,omitempty"`
+	// MarkAsDeleteDate holds the value of the "mark_as_delete_date" field.
+	MarkAsDeleteDate *time.Time `json:"mark_as_delete_date,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +34,7 @@ func (*Role) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case role.FieldName:
 			values[i] = new(sql.NullString)
-		case role.FieldCreationDate, role.FieldLastUpdateDate:
+		case role.FieldCreationDate, role.FieldLastUpdateDate, role.FieldMarkAsDeleteDate:
 			values[i] = new(sql.NullTime)
 		case role.FieldID:
 			values[i] = new(uuid.UUID)
@@ -75,6 +77,13 @@ func (r *Role) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.LastUpdateDate = value.Time
 			}
+		case role.FieldMarkAsDeleteDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field mark_as_delete_date", values[i])
+			} else if value.Valid {
+				r.MarkAsDeleteDate = new(time.Time)
+				*r.MarkAsDeleteDate = value.Time
+			}
 		}
 	}
 	return nil
@@ -109,6 +118,10 @@ func (r *Role) String() string {
 	builder.WriteString(r.CreationDate.Format(time.ANSIC))
 	builder.WriteString(", last_update_date=")
 	builder.WriteString(r.LastUpdateDate.Format(time.ANSIC))
+	if v := r.MarkAsDeleteDate; v != nil {
+		builder.WriteString(", mark_as_delete_date=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

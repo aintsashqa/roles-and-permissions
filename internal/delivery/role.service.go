@@ -12,6 +12,6 @@ type (
 		Update(ctx context.Context, dto UpdateRoleDto) (RoleDto, error)
 		Delete(ctx context.Context, roleId uuid.UUID) error
 		GetRole(ctx context.Context, roleId uuid.UUID) (RoleDto, error)
-		GetAvailableRolesList(ctx context.Context) (RolesListDto, error)
+		GetAvailableRolesList(ctx context.Context, includeDeleted bool) (RolesListDto, error)
 	}
 )

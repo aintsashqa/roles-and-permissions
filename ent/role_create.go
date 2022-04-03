@@ -55,6 +55,20 @@ func (rc *RoleCreate) SetNillableLastUpdateDate(t *time.Time) *RoleCreate {
 	return rc
 }
 
+// SetMarkAsDeleteDate sets the "mark_as_delete_date" field.
+func (rc *RoleCreate) SetMarkAsDeleteDate(t time.Time) *RoleCreate {
+	rc.mutation.SetMarkAsDeleteDate(t)
+	return rc
+}
+
+// SetNillableMarkAsDeleteDate sets the "mark_as_delete_date" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableMarkAsDeleteDate(t *time.Time) *RoleCreate {
+	if t != nil {
+		rc.SetMarkAsDeleteDate(*t)
+	}
+	return rc
+}
+
 // SetID sets the "id" field.
 func (rc *RoleCreate) SetID(u uuid.UUID) *RoleCreate {
 	rc.mutation.SetID(u)
@@ -229,6 +243,14 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Column: role.FieldLastUpdateDate,
 		})
 		_node.LastUpdateDate = value
+	}
+	if value, ok := rc.mutation.MarkAsDeleteDate(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: role.FieldMarkAsDeleteDate,
+		})
+		_node.MarkAsDeleteDate = &value
 	}
 	return _node, _spec
 }

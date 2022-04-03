@@ -40,6 +40,26 @@ func (ru *RoleUpdate) SetLastUpdateDate(t time.Time) *RoleUpdate {
 	return ru
 }
 
+// SetMarkAsDeleteDate sets the "mark_as_delete_date" field.
+func (ru *RoleUpdate) SetMarkAsDeleteDate(t time.Time) *RoleUpdate {
+	ru.mutation.SetMarkAsDeleteDate(t)
+	return ru
+}
+
+// SetNillableMarkAsDeleteDate sets the "mark_as_delete_date" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableMarkAsDeleteDate(t *time.Time) *RoleUpdate {
+	if t != nil {
+		ru.SetMarkAsDeleteDate(*t)
+	}
+	return ru
+}
+
+// ClearMarkAsDeleteDate clears the value of the "mark_as_delete_date" field.
+func (ru *RoleUpdate) ClearMarkAsDeleteDate() *RoleUpdate {
+	ru.mutation.ClearMarkAsDeleteDate()
+	return ru
+}
+
 // Mutation returns the RoleMutation object of the builder.
 func (ru *RoleUpdate) Mutation() *RoleMutation {
 	return ru.mutation
@@ -156,6 +176,19 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: role.FieldLastUpdateDate,
 		})
 	}
+	if value, ok := ru.mutation.MarkAsDeleteDate(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: role.FieldMarkAsDeleteDate,
+		})
+	}
+	if ru.mutation.MarkAsDeleteDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: role.FieldMarkAsDeleteDate,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{role.Label}
@@ -184,6 +217,26 @@ func (ruo *RoleUpdateOne) SetName(s string) *RoleUpdateOne {
 // SetLastUpdateDate sets the "last_update_date" field.
 func (ruo *RoleUpdateOne) SetLastUpdateDate(t time.Time) *RoleUpdateOne {
 	ruo.mutation.SetLastUpdateDate(t)
+	return ruo
+}
+
+// SetMarkAsDeleteDate sets the "mark_as_delete_date" field.
+func (ruo *RoleUpdateOne) SetMarkAsDeleteDate(t time.Time) *RoleUpdateOne {
+	ruo.mutation.SetMarkAsDeleteDate(t)
+	return ruo
+}
+
+// SetNillableMarkAsDeleteDate sets the "mark_as_delete_date" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableMarkAsDeleteDate(t *time.Time) *RoleUpdateOne {
+	if t != nil {
+		ruo.SetMarkAsDeleteDate(*t)
+	}
+	return ruo
+}
+
+// ClearMarkAsDeleteDate clears the value of the "mark_as_delete_date" field.
+func (ruo *RoleUpdateOne) ClearMarkAsDeleteDate() *RoleUpdateOne {
+	ruo.mutation.ClearMarkAsDeleteDate()
 	return ruo
 }
 
@@ -325,6 +378,19 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: role.FieldLastUpdateDate,
+		})
+	}
+	if value, ok := ruo.mutation.MarkAsDeleteDate(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: role.FieldMarkAsDeleteDate,
+		})
+	}
+	if ruo.mutation.MarkAsDeleteDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: role.FieldMarkAsDeleteDate,
 		})
 	}
 	_node = &Role{config: ruo.config}

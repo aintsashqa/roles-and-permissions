@@ -127,7 +127,8 @@ func (handler *roleHandler) GetRole(w http.ResponseWriter, r *http.Request) erro
 }
 
 func (handler *roleHandler) GetRolesList(w http.ResponseWriter, r *http.Request) error {
-	result, err := handler.service.GetAvailableRolesList(r.Context())
+	includeDeleted := r.URL.Query().Has("include_deleted")
+	result, err := handler.service.GetAvailableRolesList(r.Context(), includeDeleted)
 	if err != nil {
 		return err
 	}
@@ -135,10 +136,11 @@ func (handler *roleHandler) GetRolesList(w http.ResponseWriter, r *http.Request)
 	var roles []RoleResponse
 	for _, r := range result.Roles {
 		temp := RoleResponse{
-			ID:             r.ID,
-			Name:           r.Name,
-			CreationDate:   r.CreationDate,
-			LastUpdateDate: r.LastUpdateDate,
+			ID:               r.ID,
+			Name:             r.Name,
+			CreationDate:     r.CreationDate,
+			LastUpdateDate:   r.LastUpdateDate,
+			MarkAsDeleteDate: r.MarkAsDeleteDate,
 		}
 
 		roles = append(roles, temp)

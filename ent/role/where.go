@@ -114,6 +114,13 @@ func LastUpdateDate(v time.Time) predicate.Role {
 	})
 }
 
+// MarkAsDeleteDate applies equality check predicate on the "mark_as_delete_date" field. It's identical to MarkAsDeleteDateEQ.
+func MarkAsDeleteDate(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
@@ -374,6 +381,96 @@ func LastUpdateDateLT(v time.Time) predicate.Role {
 func LastUpdateDateLTE(v time.Time) predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldLastUpdateDate), v))
+	})
+}
+
+// MarkAsDeleteDateEQ applies the EQ predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateEQ(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateNEQ applies the NEQ predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateNEQ(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateIn applies the In predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateIn(vs ...time.Time) predicate.Role {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Role(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldMarkAsDeleteDate), v...))
+	})
+}
+
+// MarkAsDeleteDateNotIn applies the NotIn predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateNotIn(vs ...time.Time) predicate.Role {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Role(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldMarkAsDeleteDate), v...))
+	})
+}
+
+// MarkAsDeleteDateGT applies the GT predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateGT(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateGTE applies the GTE predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateGTE(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateLT applies the LT predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateLT(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateLTE applies the LTE predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateLTE(v time.Time) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldMarkAsDeleteDate), v))
+	})
+}
+
+// MarkAsDeleteDateIsNil applies the IsNil predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateIsNil() predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldMarkAsDeleteDate)))
+	})
+}
+
+// MarkAsDeleteDateNotNil applies the NotNil predicate on the "mark_as_delete_date" field.
+func MarkAsDeleteDateNotNil() predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldMarkAsDeleteDate)))
 	})
 }
 

@@ -14,6 +14,7 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 255},
 		{Name: "creation_date", Type: field.TypeTime},
 		{Name: "last_update_date", Type: field.TypeTime},
+		{Name: "mark_as_delete_date", Type: field.TypeTime, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{

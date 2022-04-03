@@ -31,16 +31,17 @@ const (
 // RoleMutation represents an operation that mutates the Role nodes in the graph.
 type RoleMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *uuid.UUID
-	name             *string
-	creation_date    *time.Time
-	last_update_date *time.Time
-	clearedFields    map[string]struct{}
-	done             bool
-	oldValue         func(context.Context) (*Role, error)
-	predicates       []predicate.Role
+	op                  Op
+	typ                 string
+	id                  *uuid.UUID
+	name                *string
+	creation_date       *time.Time
+	last_update_date    *time.Time
+	mark_as_delete_date *time.Time
+	clearedFields       map[string]struct{}
+	done                bool
+	oldValue            func(context.Context) (*Role, error)
+	predicates          []predicate.Role
 }
 
 var _ ent.Mutation = (*RoleMutation)(nil)
@@ -255,6 +256,55 @@ func (m *RoleMutation) ResetLastUpdateDate() {
 	m.last_update_date = nil
 }
 
+// SetMarkAsDeleteDate sets the "mark_as_delete_date" field.
+func (m *RoleMutation) SetMarkAsDeleteDate(t time.Time) {
+	m.mark_as_delete_date = &t
+}
+
+// MarkAsDeleteDate returns the value of the "mark_as_delete_date" field in the mutation.
+func (m *RoleMutation) MarkAsDeleteDate() (r time.Time, exists bool) {
+	v := m.mark_as_delete_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMarkAsDeleteDate returns the old "mark_as_delete_date" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldMarkAsDeleteDate(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMarkAsDeleteDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMarkAsDeleteDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMarkAsDeleteDate: %w", err)
+	}
+	return oldValue.MarkAsDeleteDate, nil
+}
+
+// ClearMarkAsDeleteDate clears the value of the "mark_as_delete_date" field.
+func (m *RoleMutation) ClearMarkAsDeleteDate() {
+	m.mark_as_delete_date = nil
+	m.clearedFields[role.FieldMarkAsDeleteDate] = struct{}{}
+}
+
+// MarkAsDeleteDateCleared returns if the "mark_as_delete_date" field was cleared in this mutation.
+func (m *RoleMutation) MarkAsDeleteDateCleared() bool {
+	_, ok := m.clearedFields[role.FieldMarkAsDeleteDate]
+	return ok
+}
+
+// ResetMarkAsDeleteDate resets all changes to the "mark_as_delete_date" field.
+func (m *RoleMutation) ResetMarkAsDeleteDate() {
+	m.mark_as_delete_date = nil
+	delete(m.clearedFields, role.FieldMarkAsDeleteDate)
+}
+
 // Where appends a list predicates to the RoleMutation builder.
 func (m *RoleMutation) Where(ps ...predicate.Role) {
 	m.predicates = append(m.predicates, ps...)
@@ -274,7 +324,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, role.FieldName)
 	}
@@ -283,6 +333,9 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.last_update_date != nil {
 		fields = append(fields, role.FieldLastUpdateDate)
+	}
+	if m.mark_as_delete_date != nil {
+		fields = append(fields, role.FieldMarkAsDeleteDate)
 	}
 	return fields
 }
@@ -298,6 +351,8 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CreationDate()
 	case role.FieldLastUpdateDate:
 		return m.LastUpdateDate()
+	case role.FieldMarkAsDeleteDate:
+		return m.MarkAsDeleteDate()
 	}
 	return nil, false
 }
@@ -313,6 +368,8 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreationDate(ctx)
 	case role.FieldLastUpdateDate:
 		return m.OldLastUpdateDate(ctx)
+	case role.FieldMarkAsDeleteDate:
+		return m.OldMarkAsDeleteDate(ctx)
 	}
 	return nil, fmt.Errorf("unknown Role field %s", name)
 }
@@ -343,6 +400,13 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLastUpdateDate(v)
 		return nil
+	case role.FieldMarkAsDeleteDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMarkAsDeleteDate(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)
 }
@@ -372,7 +436,11 @@ func (m *RoleMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *RoleMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(role.FieldMarkAsDeleteDate) {
+		fields = append(fields, role.FieldMarkAsDeleteDate)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -385,6 +453,11 @@ func (m *RoleMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *RoleMutation) ClearField(name string) error {
+	switch name {
+	case role.FieldMarkAsDeleteDate:
+		m.ClearMarkAsDeleteDate()
+		return nil
+	}
 	return fmt.Errorf("unknown Role nullable field %s", name)
 }
 
@@ -400,6 +473,9 @@ func (m *RoleMutation) ResetField(name string) error {
 		return nil
 	case role.FieldLastUpdateDate:
 		m.ResetLastUpdateDate()
+		return nil
+	case role.FieldMarkAsDeleteDate:
+		m.ResetMarkAsDeleteDate()
 		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)

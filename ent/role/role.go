@@ -19,6 +19,8 @@ const (
 	FieldCreationDate = "creation_date"
 	// FieldLastUpdateDate holds the string denoting the last_update_date field in the database.
 	FieldLastUpdateDate = "last_update_date"
+	// FieldMarkAsDeleteDate holds the string denoting the mark_as_delete_date field in the database.
+	FieldMarkAsDeleteDate = "mark_as_delete_date"
 	// Table holds the table name of the role in the database.
 	Table = "roles"
 )
@@ -29,6 +31,7 @@ var Columns = []string{
 	FieldName,
 	FieldCreationDate,
 	FieldLastUpdateDate,
+	FieldMarkAsDeleteDate,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

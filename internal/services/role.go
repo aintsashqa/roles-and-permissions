@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/aintsashqa/roles-and-permissions/ent"
 	"github.com/aintsashqa/roles-and-permissions/ent/role"
@@ -40,7 +41,7 @@ func (srv *roleServiceImpl) Create(ctx context.Context, dto delivery.CreateRoleD
 
 func (srv *roleServiceImpl) Update(ctx context.Context, dto delivery.UpdateRoleDto) (delivery.RoleDto, error) {
 	roleResult, err := srv.client.Role.Query().
-		Where(role.ID(dto.ID)).Only(ctx)
+		Where(role.MarkAsDeleteDateIsNil(), role.ID(dto.ID)).Only(ctx)
 	if err != nil {
 		return delivery.RoleDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
@@ -59,8 +60,9 @@ func (srv *roleServiceImpl) Update(ctx context.Context, dto delivery.UpdateRoleD
 }
 
 func (srv *roleServiceImpl) Delete(ctx context.Context, roleId uuid.UUID) error {
-	_, err := srv.client.Role.Delete().
-		Where(role.ID(roleId)).Exec(ctx)
+	_, err := srv.client.Role.Update().
+		SetMarkAsDeleteDate(time.Now()).
+		Where(role.MarkAsDeleteDateIsNil(), role.ID(roleId)).Save(ctx)
 	if err != nil {
 		return cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
@@ -70,7 +72,7 @@ func (srv *roleServiceImpl) Delete(ctx context.Context, roleId uuid.UUID) error 
 
 func (srv *roleServiceImpl) GetRole(ctx context.Context, roleId uuid.UUID) (delivery.RoleDto, error) {
 	roleResult, err := srv.client.Role.Query().
-		Where(role.ID(roleId)).Only(ctx)
+		Where(role.MarkAsDeleteDateIsNil(), role.ID(roleId)).Only(ctx)
 	if err != nil {
 		return delivery.RoleDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
@@ -83,9 +85,13 @@ func (srv *roleServiceImpl) GetRole(ctx context.Context, roleId uuid.UUID) (deli
 	}, nil
 }
 
-func (srv *roleServiceImpl) GetAvailableRolesList(ctx context.Context) (delivery.RolesListDto, error) {
-	rolesResult, err := srv.client.Role.Query().
-		Where().All(ctx)
+func (srv *roleServiceImpl) GetAvailableRolesList(ctx context.Context, includeDeleted bool) (delivery.RolesListDto, error) {
+	query := srv.client.Role.Query()
+	if !includeDeleted {
+		query = query.Where(role.MarkAsDeleteDateIsNil())
+	}
+
+	rolesResult, err := query.All(ctx)
 	if err != nil {
 		return delivery.RolesListDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
@@ -93,10 +99,11 @@ func (srv *roleServiceImpl) GetAvailableRolesList(ctx context.Context) (delivery
 	var roles []delivery.RoleDto
 	for _, r := range rolesResult {
 		temp := delivery.RoleDto{
-			ID:             r.ID,
-			Name:           r.Name,
-			CreationDate:   r.CreationDate,
-			LastUpdateDate: r.LastUpdateDate,
+			ID:               r.ID,
+			Name:             r.Name,
+			CreationDate:     r.CreationDate,
+			LastUpdateDate:   r.LastUpdateDate,
+			MarkAsDeleteDate: r.MarkAsDeleteDate,
 		}
 
 		roles = append(roles, temp)
