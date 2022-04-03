@@ -115,11 +115,22 @@ func (handler *roleHandler) GetRole(w http.ResponseWriter, r *http.Request) erro
 		return err
 	}
 
+	var permissions []RolePermissionResponse
+	for _, p := range result.Permissions {
+		temp := RolePermissionResponse{
+			ID:   p.ID,
+			Name: p.Name,
+		}
+
+		permissions = append(permissions, temp)
+	}
+
 	resp := RoleResponse{
 		ID:             result.ID,
 		Name:           result.Name,
 		CreationDate:   result.CreationDate,
 		LastUpdateDate: result.LastUpdateDate,
+		Permissions:    permissions,
 	}
 
 	w.WriteHeader(http.StatusOK)

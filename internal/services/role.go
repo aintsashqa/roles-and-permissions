@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/aintsashqa/roles-and-permissions/ent"
+	"github.com/aintsashqa/roles-and-permissions/ent/permission"
 	"github.com/aintsashqa/roles-and-permissions/ent/role"
 	"github.com/aintsashqa/roles-and-permissions/internal/cerror"
 	"github.com/aintsashqa/roles-and-permissions/internal/delivery"
@@ -72,9 +73,23 @@ func (srv *roleServiceImpl) Delete(ctx context.Context, roleId uuid.UUID) error 
 
 func (srv *roleServiceImpl) GetRole(ctx context.Context, roleId uuid.UUID) (delivery.RoleDto, error) {
 	roleResult, err := srv.client.Role.Query().
+		WithPermissions(func(q *ent.PermissionQuery) {
+			q.Select(permission.FieldID, permission.FieldName)
+			q.Where(permission.MarkAsDeleteDateIsNil())
+		}).
 		Where(role.MarkAsDeleteDateIsNil(), role.ID(roleId)).Only(ctx)
 	if err != nil {
 		return delivery.RoleDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	var permissions []delivery.PermissionDto
+	for _, p := range roleResult.Edges.Permissions {
+		temp := delivery.PermissionDto{
+			ID:   p.ID,
+			Name: p.Name,
+		}
+
+		permissions = append(permissions, temp)
 	}
 
 	return delivery.RoleDto{
@@ -82,6 +97,7 @@ func (srv *roleServiceImpl) GetRole(ctx context.Context, roleId uuid.UUID) (deli
 		Name:           roleResult.Name,
 		CreationDate:   roleResult.CreationDate,
 		LastUpdateDate: roleResult.LastUpdateDate,
+		Permissions:    permissions,
 	}, nil
 }
 
