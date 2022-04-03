@@ -20,7 +20,7 @@ func (Role) Fields() []ent.Field {
 		field.String("name").NotEmpty().MaxLen(255),
 		field.Time("creation_date").Default(time.Now).Immutable(),
 		field.Time("last_update_date").Default(time.Now).UpdateDefault(time.Now),
-		//field.Time("mark_as_delete_date").Optional().Nillable(),
+		field.Time("mark_as_delete_date").Optional().Nillable(),
 	}
 }
 

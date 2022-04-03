@@ -45,7 +45,8 @@ func (srv *roleServiceImpl) Update(ctx context.Context, dto delivery.UpdateRoleD
 		return delivery.RoleDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
 
-	if _, err = roleResult.Update().SetName(dto.Name).Save(ctx); err != nil {
+	roleResult, err = roleResult.Update().SetName(dto.Name).Save(ctx)
+	if err != nil {
 		return delivery.RoleDto{}, cerror.Wrap(err, cerror.InternalComplexErrorType)
 	}
 
