@@ -9,13 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-// Role holds the schema definition for the Role entity.
-type Role struct {
+// Permission holds the schema definition for the Permission entity.
+type Permission struct {
 	ent.Schema
 }
 
-// Fields of the Role.
-func (Role) Fields() []ent.Field {
+// Fields of the Permission.
+func (Permission) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.New()).Default(uuid.New).Immutable().Unique(),
 		field.String("name").NotEmpty().MaxLen(255),
@@ -25,9 +25,9 @@ func (Role) Fields() []ent.Field {
 	}
 }
 
-// Edges of the Role.
-func (Role) Edges() []ent.Edge {
+// Edges of the Permission.
+func (Permission) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("permissions", Permission.Type),
+		edge.From("roles", Role.Type).Ref("permissions"),
 	}
 }

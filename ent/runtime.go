@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/aintsashqa/roles-and-permissions/ent/permission"
 	"github.com/aintsashqa/roles-and-permissions/ent/role"
 	"github.com/aintsashqa/roles-and-permissions/ent/schema"
 	"github.com/google/uuid"
@@ -14,6 +15,40 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	permissionFields := schema.Permission{}.Fields()
+	_ = permissionFields
+	// permissionDescName is the schema descriptor for name field.
+	permissionDescName := permissionFields[1].Descriptor()
+	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	permission.NameValidator = func() func(string) error {
+		validators := permissionDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// permissionDescCreationDate is the schema descriptor for creation_date field.
+	permissionDescCreationDate := permissionFields[2].Descriptor()
+	// permission.DefaultCreationDate holds the default value on creation for the creation_date field.
+	permission.DefaultCreationDate = permissionDescCreationDate.Default.(func() time.Time)
+	// permissionDescLastUpdateDate is the schema descriptor for last_update_date field.
+	permissionDescLastUpdateDate := permissionFields[3].Descriptor()
+	// permission.DefaultLastUpdateDate holds the default value on creation for the last_update_date field.
+	permission.DefaultLastUpdateDate = permissionDescLastUpdateDate.Default.(func() time.Time)
+	// permission.UpdateDefaultLastUpdateDate holds the default value on update for the last_update_date field.
+	permission.UpdateDefaultLastUpdateDate = permissionDescLastUpdateDate.UpdateDefault.(func() time.Time)
+	// permissionDescID is the schema descriptor for id field.
+	permissionDescID := permissionFields[0].Descriptor()
+	// permission.DefaultID holds the default value on creation for the id field.
+	permission.DefaultID = permissionDescID.Default.(func() uuid.UUID)
 	roleFields := schema.Role{}.Fields()
 	_ = roleFields
 	// roleDescName is the schema descriptor for name field.

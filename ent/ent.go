@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/aintsashqa/roles-and-permissions/ent/permission"
 	"github.com/aintsashqa/roles-and-permissions/ent/role"
 )
 
@@ -29,7 +30,8 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		role.Table: role.ValidColumn,
+		permission.Table: permission.ValidColumn,
+		role.Table:       role.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

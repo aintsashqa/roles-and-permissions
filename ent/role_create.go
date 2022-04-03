@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/aintsashqa/roles-and-permissions/ent/permission"
 	"github.com/aintsashqa/roles-and-permissions/ent/role"
 	"github.com/google/uuid"
 )
@@ -81,6 +82,21 @@ func (rc *RoleCreate) SetNillableID(u *uuid.UUID) *RoleCreate {
 		rc.SetID(*u)
 	}
 	return rc
+}
+
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (rc *RoleCreate) AddPermissionIDs(ids ...uuid.UUID) *RoleCreate {
+	rc.mutation.AddPermissionIDs(ids...)
+	return rc
+}
+
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (rc *RoleCreate) AddPermissions(p ...*Permission) *RoleCreate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return rc.AddPermissionIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
@@ -251,6 +267,25 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Column: role.FieldMarkAsDeleteDate,
 		})
 		_node.MarkAsDeleteDate = &value
+	}
+	if nodes := rc.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   role.PermissionsTable,
+			Columns: role.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: permission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
