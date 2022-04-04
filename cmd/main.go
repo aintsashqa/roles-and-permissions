@@ -25,8 +25,10 @@ func main() {
 	}
 
 	roleService := services.NewRoleServiceImpl(client)
+	permissionService := services.NewPermissionServiceImpl(client)
 	container := delivery.Container{
-		RoleService: roleService,
+		RoleService:       roleService,
+		PermissionService: permissionService,
 	}
 
 	handler := rest.RegisterRoutes(&container)

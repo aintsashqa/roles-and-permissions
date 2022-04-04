@@ -1,5 +1,6 @@
 package delivery
 
 type Container struct {
-	RoleService RoleService
+	RoleService       RoleService
+	PermissionService PermissionService
 }
