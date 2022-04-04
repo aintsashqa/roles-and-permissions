@@ -14,6 +14,7 @@ func RegisterRoutes(container *delivery.Container) http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			v1.RegisterRoleRoutes(r, container)
+			v1.RegisterPermissionRoutes(r, container)
 		})
 	})
 
