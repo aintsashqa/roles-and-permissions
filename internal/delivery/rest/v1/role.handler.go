@@ -27,6 +27,9 @@ func RegisterRoleRoutes(r chi.Router, container *delivery.Container) {
 		r.Put("/{role_id}", pkg.ErrorHandler(handler.Update).ServeHTTP)
 		r.Get("/{role_id}", pkg.ErrorHandler(handler.GetRole).ServeHTTP)
 		r.Delete("/{role_id}", pkg.ErrorHandler(handler.Delete).ServeHTTP)
+
+		r.Patch("/{role_id}/permissions/attach", pkg.ErrorHandler(handler.AttachPermissions).ServeHTTP)
+		r.Patch("/{role_id}/permissions/detach", pkg.ErrorHandler(handler.DetachPermissions).ServeHTTP)
 	})
 }
 
@@ -164,4 +167,42 @@ func (handler *roleHandler) GetRolesList(w http.ResponseWriter, r *http.Request)
 
 	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(resp)
+}
+
+func (handler *roleHandler) AttachPermissions(w http.ResponseWriter, r *http.Request) error {
+	var req UpdateRolePermissionsRequest
+	if err := req.Parse(r); err != nil {
+		return err
+	}
+
+	dto := delivery.UpdateRolePermissionsDto{
+		ID:             req.ID,
+		PermissionsIDs: req.PermissionsIDs,
+	}
+
+	if err := handler.service.AttachPermissions(r.Context(), dto); err != nil {
+		return err
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	return nil
+}
+
+func (handler *roleHandler) DetachPermissions(w http.ResponseWriter, r *http.Request) error {
+	var req UpdateRolePermissionsRequest
+	if err := req.Parse(r); err != nil {
+		return err
+	}
+
+	dto := delivery.UpdateRolePermissionsDto{
+		ID:             req.ID,
+		PermissionsIDs: req.PermissionsIDs,
+	}
+
+	if err := handler.service.DetachPermissions(r.Context(), dto); err != nil {
+		return err
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	return nil
 }

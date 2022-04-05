@@ -18,6 +18,11 @@ type (
 		ID   uuid.UUID `json:"-"`
 		Name string    `json:"name"`
 	}
+
+	UpdateRolePermissionsRequest struct {
+		ID             uuid.UUID   `json:"-"`
+		PermissionsIDs []uuid.UUID `json:"permissions_ids"`
+	}
 )
 
 func (req *CreateRoleRequest) Parse(r *http.Request) error {
@@ -29,6 +34,24 @@ func (req *CreateRoleRequest) Parse(r *http.Request) error {
 }
 
 func (req *UpdateRoleRequest) Parse(r *http.Request) error {
+	roleIdParam := chi.URLParam(r, "role_id")
+	if len(roleIdParam) != 0 {
+		roleId, err := uuid.Parse(roleIdParam)
+		if err != nil {
+			return cerror.Wrap(err, cerror.InternalComplexErrorType)
+		}
+
+		req.ID = roleId
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	return nil
+}
+
+func (req *UpdateRolePermissionsRequest) Parse(r *http.Request) error {
 	roleIdParam := chi.URLParam(r, "role_id")
 	if len(roleIdParam) != 0 {
 		roleId, err := uuid.Parse(roleIdParam)
