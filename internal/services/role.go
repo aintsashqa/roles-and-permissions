@@ -130,3 +130,71 @@ func (srv *roleServiceImpl) GetAvailableRolesList(ctx context.Context, includeDe
 		Roles: roles,
 	}, nil
 }
+
+func (srv *roleServiceImpl) AttachPermissions(ctx context.Context, dto delivery.UpdateRolePermissionsDto) error {
+	roleResult, err := srv.client.Role.Query().
+		WithPermissions(func(q *ent.PermissionQuery) {
+			q.Select(permission.FieldID)
+		}).
+		Where(role.ID(dto.ID)).Only(ctx)
+	if err != nil {
+		return cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	contains := func(ps []*ent.Permission, permissionId uuid.UUID) bool {
+		for _, p := range ps {
+			if p.ID == permissionId {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	query := srv.client.Role.UpdateOne(roleResult)
+	for _, id := range dto.PermissionsIDs {
+		if !contains(roleResult.Edges.Permissions, id) {
+			query.AddPermissionIDs(id)
+		}
+	}
+
+	if _, err := query.Save(ctx); err != nil {
+		return cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	return nil
+}
+
+func (srv *roleServiceImpl) DetachPermissions(ctx context.Context, dto delivery.UpdateRolePermissionsDto) error {
+	roleResult, err := srv.client.Role.Query().
+		WithPermissions(func(q *ent.PermissionQuery) {
+			q.Select(permission.FieldID)
+		}).
+		Where(role.ID(dto.ID)).Only(ctx)
+	if err != nil {
+		return cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	contains := func(ps []*ent.Permission, permissionId uuid.UUID) bool {
+		for _, p := range ps {
+			if p.ID == permissionId {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	query := srv.client.Role.UpdateOne(roleResult)
+	for _, id := range dto.PermissionsIDs {
+		if contains(roleResult.Edges.Permissions, id) {
+			query.RemovePermissionIDs(id)
+		}
+	}
+
+	if _, err := query.Save(ctx); err != nil {
+		return cerror.Wrap(err, cerror.InternalComplexErrorType)
+	}
+
+	return nil
+}

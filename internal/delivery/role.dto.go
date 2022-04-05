@@ -16,6 +16,11 @@ type (
 		Name string
 	}
 
+	UpdateRolePermissionsDto struct {
+		ID             uuid.UUID
+		PermissionsIDs []uuid.UUID
+	}
+
 	RoleDto struct {
 		ID               uuid.UUID
 		Name             string
